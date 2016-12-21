@@ -242,7 +242,7 @@ int NFCProperty::OnEventHandler(const NFIDataList::TData& oldVar, const NFIDataL
 	TPROPERTYCALLBACKEX::iterator end = mtPropertyCallback.end();
 	for (it; it != end; ++it)
 	{
-		//NFIDataList参数:属性名，OLD属性值，NEW属性值, ARG参数(pKernel,self)
+		
 		PROPERTY_EVENT_FUNCTOR_PTR& pFunPtr = *it;
 		PROPERTY_EVENT_FUNCTOR* pFunc = pFunPtr.get();
 		int nTemRet = pFunc->operator()(mSelf, msPropertyName, oldVar, newVar);
@@ -260,7 +260,7 @@ bool NFCProperty::SetInt(const NFINT64 value)
 
 	if (!mxData)
 	{
-		//本身是空就是因为没数据，还来个没数据的就不存了
+		
 		if (0 == value)
 		{
 			return false;
@@ -301,7 +301,7 @@ bool NFCProperty::SetFloat(const double value)
 
 	if (!mxData)
 	{
-		//本身是空就是因为没数据，还来个没数据的就不存了
+		
 		if (IsZeroDouble(value))
 		{
 			return false;
@@ -342,7 +342,7 @@ bool NFCProperty::SetString(const std::string& value)
 
 	if (!mxData)
 	{
-		//本身是空就是因为没数据，还来个没数据的就不存了
+		
 		if (value.empty())
 		{
 			return false;
@@ -383,7 +383,7 @@ bool NFCProperty::SetObject(const NFGUID& value)
 
 	if (!mxData)
 	{
-		//本身是空就是因为没数据，还来个没数据的就不存了
+		
 		if (value.IsNull())
 		{
 			return false;
@@ -424,7 +424,7 @@ bool NFCProperty::SetVector2(const NFVector2& value)
 
 	if (!mxData)
 	{
-		//本身是空就是因为没数据，还来个没数据的就不存了
+		
 		if (value.IsZero())
 		{
 			return false;
@@ -465,7 +465,7 @@ bool NFCProperty::SetVector3(const NFVector3& value)
 
 	if (!mxData)
 	{
-		//本身是空就是因为没数据，还来个没数据的就不存了
+		
 		if (value.IsZero())
 		{
 			return false;

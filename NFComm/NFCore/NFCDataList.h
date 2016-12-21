@@ -11,8 +11,9 @@
 
 #include "NFIDataList.h"
 #include "NFComm/NFPluginModule/NFGUID.h"
+#include "NFComm/NFPluginModule/NFPlatform.h"
 
-class NFCDataList: public NFIDataList
+class _NFExport NFCDataList: public NFIDataList
 {
 public:
     NFCDataList();
@@ -24,32 +25,32 @@ public:
 
     virtual ~NFCDataList();
 
-    // 添加
+    
     virtual bool Append(const NFIDataList& src);
     virtual bool Append(const NFIDataList& src, const int start, const int count);
 
-    // 添加
+    
     virtual bool Append(const NFIDataList::TData& TData);
 
-    // 清空
+    
     virtual void Clear();
 
-    // 是否为空
+    
     virtual bool IsEmpty() const;
 
-    // 数据数量
+    
     virtual int GetCount() const;
 
-    // 合并
+    
     virtual bool Concat(const NFIDataList& src);
 
     //////////////////////////////////////////////////////////////////////////
     const NF_SHARE_PTR<NFIDataList::TData> GetStack(const int index) const;
 
-    // 数据类型
+    
     virtual TDATA_TYPE Type(const int index) const;
     int TypeInt(const int index) const;
-    //数据类型检测
+    
     virtual bool TypeEx(const  int nType, ...) const;
 
     virtual bool Split(const std::string& strData, const std::string& strSplit);
@@ -68,7 +69,7 @@ public:
 	virtual bool Set(const int index, const NFVector2& value);
 	virtual bool Set(const int index, const NFVector3& value);
 
-    // 获得数据
+    
     virtual NFINT64 Int(const int index) const;
     virtual double Float(const int index) const;
     virtual std::string StringValEx(const int index) const;

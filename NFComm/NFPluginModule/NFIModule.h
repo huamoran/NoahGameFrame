@@ -10,8 +10,8 @@
 #define NFI_LOGIC_MODULE_H
 
 #include <string>
-#include "NFComm/NFCore/NFMap.h"
-#include "NFComm/NFCore/NFList.h"
+#include "NFComm/NFCore/NFMap.hpp"
+#include "NFComm/NFCore/NFList.hpp"
 #include "NFComm/NFCore/NFIDataList.h"
 #include "NFComm/NFCore/NFIRecord.h"
 
@@ -48,6 +48,11 @@ public:
 
     virtual ~NFIModule() {}
 
+    virtual bool Awake()
+    {
+        return true;
+    }
+
     virtual bool Init()
     {
 
@@ -64,6 +69,16 @@ public:
         return true;
     }
 
+    virtual bool ReadyExecute()
+    {
+        return true;
+    }
+
+    virtual bool Execute()
+    {
+        return true;
+    }
+
     virtual bool BeforeShut()
     {
         return true;
@@ -73,13 +88,7 @@ public:
     {
         return true;
     }
-
-    virtual bool ReadyExecute()
-    {
-        return true;
-    }
-
-    virtual bool Execute()
+    virtual bool Finalize()
     {
         return true;
     }
@@ -105,13 +114,11 @@ public:
     {
         return mbReloading;
     }
-public:
+
     std::string strName;
 
-
 protected:
-    NFIPluginManager* pPluginManager;
-
+	NFIPluginManager* pPluginManager = NULL;
 
 private:
 

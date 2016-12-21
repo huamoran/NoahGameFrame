@@ -9,7 +9,7 @@
 #ifndef NFC_TEAM_MODULE_H
 #define NFC_TEAM_MODULE_H
 
-#include "NFComm/NFCore/NFMap.h"
+#include "NFComm/NFCore/NFMap.hpp"
 #include "NFComm/NFPluginModule/NFIKernelModule.h"
 #include "NFComm/NFPluginModule/NFITeamModule.h"
 #include "NFComm/NFPluginModule/NFILogModule.h"
@@ -41,7 +41,7 @@ public:
     virtual bool GetPlayerGameID(const NFGUID& self, int& nGameID);
     virtual bool GetMemberList(const NFGUID& self, const NFGUID& xTeam, std::vector<NFGUID>& xmemberList);
     virtual bool MemberOnline(const NFGUID& self, const NFGUID& xTeam, const int& nGameID);
-    virtual bool MemberOffeline(const NFGUID& self, const NFGUID& xTeam);
+    virtual bool MemberOffline(const NFGUID& self, const NFGUID& xTeam);
     virtual bool BroadcastMsgToTeam(const NFGUID& self, const NFGUID& xTeam, const uint16_t nMsgID, google::protobuf::Message& xData);
 
 protected:

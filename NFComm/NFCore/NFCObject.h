@@ -14,14 +14,15 @@
 #include "NFComm/NFCore/NFIObject.h"
 #include "NFComm/NFCore/NFIRecordManager.h"
 #include "NFComm/NFCore/NFIPropertyManager.h"
+#include "NFComm/NFPluginModule/NFPlatform.h"
 
-class NFCObject
+class _NFExport NFCObject
     : public NFIObject
 {
 private:
     NFCObject() : NFIObject(NFGUID())
     {
-
+		mObjectEventState = COE_CREATE_NODATA;
     }
 
 public:
@@ -37,6 +38,9 @@ public:
     virtual NFGUID Self();
 
     /////////////////////////////////////////////////////////////////
+
+	virtual CLASS_OBJECT_EVENT GetState();
+	virtual bool SetState(const CLASS_OBJECT_EVENT eState);
 
     virtual bool FindProperty(const std::string& strPropertyName);
 
@@ -96,7 +100,7 @@ protected:
 
 private:
     NFGUID mSelf;
-
+	CLASS_OBJECT_EVENT mObjectEventState;
     NF_SHARE_PTR<NFIRecordManager> m_pRecordManager;
     NF_SHARE_PTR<NFIPropertyManager> m_pPropertyManager;
     NF_SHARE_PTR<NFIComponentManager> m_pComponentManager;

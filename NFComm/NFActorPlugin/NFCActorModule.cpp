@@ -25,9 +25,6 @@ NFCActorModule::~NFCActorModule()
     m_pMainActor.reset();
     m_pMainActor = nullptr;
 
-    delete pPluginManager;
-    pPluginManager = NULL;
-
     delete m_pFramework;
     m_pFramework = NULL;
 }
@@ -65,7 +62,7 @@ bool NFCActorModule::Execute()
 
 int NFCActorModule::RequireActor()
 {
-    //¶Ñactor
+    
     NF_SHARE_PTR<NFIActor> pActor(NF_NEW NFCActor(*m_pFramework, this));
 	mxActorMap.AddElement(pActor->GetAddress().AsInteger(), pActor);
 

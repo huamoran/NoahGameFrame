@@ -1,4 +1,4 @@
-﻿// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
 //    @FileName         :    NFCEquipModule.cpp
 //    @Author               :    LvSheng.Huang
 //    @Date                 :    2013-06-11
@@ -22,7 +22,6 @@ bool NFCEquipModule::Shut()
 
 bool NFCEquipModule::Execute()
 {
-    //Î»ÖÃÄØ
     return true;
 }
 
@@ -397,6 +396,7 @@ bool NFCEquipModule::TakeOffEquipForm(const NFGUID& self, const NFGUID& hero, co
 	//hero, position
 	pHeroRecord->SetObject(nHeroRow, nEquipPos + NFrame::Player::PlayerHero_Equip1, NFGUID());
 	pBagRecord->SetObject(nEquipRow, NFrame::Player::BagEquipList_WearGUID, NFGUID());
+	return true;
 }
 
 bool NFCEquipModule::SetEquipRandPropertyID(const NFGUID& self, const NFGUID& id, const std::string& strPropertyID)

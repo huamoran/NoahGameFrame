@@ -16,6 +16,7 @@ NFCDataList::NFCDataList()
 }
 
 NFCDataList::NFCDataList(const std::string& str, const std::string& strSplit)
+	: NFIDataList()
 {
     Clear();
 
@@ -23,6 +24,7 @@ NFCDataList::NFCDataList(const std::string& str, const std::string& strSplit)
 }
 
 NFCDataList::NFCDataList(const NFCDataList& src)
+	: NFIDataList()
 {
     Clear();
 
@@ -30,6 +32,7 @@ NFCDataList::NFCDataList(const NFCDataList& src)
 }
 
 NFCDataList::NFCDataList(const NFIDataList& src)
+	: NFIDataList()
 {
     Clear();
 
@@ -59,7 +62,7 @@ NFCDataList& NFCDataList::operator=(const NFIDataList& src)
 }
 
 */
-// 添加
+
 bool NFCDataList::Append(const NFIDataList& src, const int start, const int count)
 {
     if (start >= src.GetCount())
@@ -103,9 +106,9 @@ bool NFCDataList::Append(const NFIDataList::TData& xData)
             break;
 		case TDATA_VECTOR2:
 			AddVector2(xData.GetVector2());
+			break;
 		case TDATA_VECTOR3:
 			AddVector3(xData.GetVector3());
-			break;
 			break;
         default:
             break;
@@ -518,7 +521,7 @@ bool NFCDataList::TypeEx(const int nType, ...) const
 
     while (pareType != TDATA_UNKNOWN)
     {
-        //比较
+        
         TDATA_TYPE varType = Type(index);
         if (varType != pareType)
         {
@@ -527,10 +530,10 @@ bool NFCDataList::TypeEx(const int nType, ...) const
         }
 
         ++index;
-        pareType = (TDATA_TYPE)va_arg(arg_ptr, int);   //获取下一个参数
+        pareType = (TDATA_TYPE)va_arg(arg_ptr, int);   
     }
 
-    va_end(arg_ptr); //结束
+    va_end(arg_ptr); 
 
     return bRet;
 }
@@ -544,7 +547,7 @@ bool NFCDataList::Concat(const NFIDataList& src)
 void NFCDataList::Clear()
 {
     mnUseSize = 0;
-    //8个以后的清除掉
+    
     if (mvList.size() > STACK_SIZE)
     {
         for (int i = 0; i < STACK_SIZE; ++i)

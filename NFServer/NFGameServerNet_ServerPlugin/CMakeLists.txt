@@ -1,11 +1,9 @@
 set(ProjectName "NFGameServerNet_ServerPlugin")
 file(GLOB NFGameServerNet_ServerPlugin_ROOT_Cpp
-	dllmain.cpp
-	NFCGameServerNet_ServerModule.cpp
-	NFGameServerNet_ServerPlugin.cpp)
+	*.cpp)
+	
 file(GLOB NFGameServerNet_ServerPlugin_ROOT_Hpp 
-	NFCGameServerNet_ServerModule.h
-	NFGameServerNet_ServerPlugin.h)
+	*.h)
 
 add_library(NFGameServerNet_ServerPlugin SHARED
 	${NFGameServerNet_ServerPlugin_ROOT_Cpp}
@@ -32,5 +30,4 @@ else()
 		-D_USRDLL
 		-DELPP_NO_DEFAULT_LOG_FILE
 	)
-	
 endif()

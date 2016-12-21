@@ -389,8 +389,9 @@ void NFCWorldNet_ServerModule::OnOfflineProcess(const int nSockIndex, const int 
 
 void NFCWorldNet_ServerModule::OnTranspondServerReport(const int nFd, const int msgId, const char* buffer, const uint32_t nLen)
 {
+    NFGUID xGUID;
 	NFMsg::ServerInfoReport msg;
-	if (!m_pNetModule->ReceivePB(nFd,msgId, buffer, nLen, msg,NFGUID()))
+	if (!m_pNetModule->ReceivePB(nFd,msgId, buffer, nLen, msg, xGUID))
 	{
 		return;
 	}
@@ -454,7 +455,7 @@ int NFCWorldNet_ServerModule::OnObjectListEnter(const NFIDataList& self, const N
     for (int i = 0; i < argVar.GetCount(); i++)
     {
         NFGUID identOld = argVar.Object(i);
-        //�ų��ն���
+        
         if (identOld.IsNull())
         {
             continue;
@@ -487,7 +488,7 @@ int NFCWorldNet_ServerModule::OnObjectListEnter(const NFIDataList& self, const N
             continue;
         }
 
-        //�����ڲ�ͬ��������,�õ��������ڵ�����FD
+        
         SendMsgToPlayer(NFMsg::EGMI_ACK_OBJECT_ENTRY, xPlayerEntryInfoList, ident);
     }
 
@@ -506,7 +507,7 @@ int NFCWorldNet_ServerModule::OnObjectListLeave(const NFIDataList& self, const N
     for (int i = 0; i < argVar.GetCount(); i++)
     {
         NFGUID identOld = argVar.Object(i);
-        //�ų��ն���
+        
         if (identOld.IsNull())
         {
             continue;
@@ -523,7 +524,7 @@ int NFCWorldNet_ServerModule::OnObjectListLeave(const NFIDataList& self, const N
         {
             continue;
         }
-        //�����ڲ�ͬ��������,�õ��������ڵ�����FD
+        
         SendMsgToPlayer(NFMsg::EGMI_ACK_OBJECT_LEAVE, xPlayerLeaveInfoList, ident);
     }
 
@@ -630,13 +631,13 @@ bool NFCWorldNet_ServerModule::OnRecordEnterPack(NF_SHARE_PTR<NFIRecord> pRecord
     {
         if (pRecord->IsUsed(i))
         {
-            //����public����private��Ҫ���ϣ���Ȼpublic�㲥���ǲ���private�͹㲥������
+            
             NFMsg::RecordAddRowStruct* pAddRowStruct = pObjectRecordBase->add_row_struct();
             pAddRowStruct->set_row(i);
 
             for (int j = 0; j < pRecord->GetCols(); j++)
             {
-                //������0�Ͳ������ˣ���Ϊ�ͻ���Ĭ����0
+                
                 NFCDataList valueList;
                 TDATA_TYPE eType = pRecord->GetColType(j);
                 switch (eType)
@@ -714,9 +715,9 @@ int NFCWorldNet_ServerModule::OnPropertyEnter(const NFIDataList& argVar, const N
     NFMsg::MultiObjectPropertyList xPublicMsg;
     NFMsg::MultiObjectPropertyList xPrivateMsg;
 
-    //��Ϊ�Լ�������
-    //1.public���͸�������
-    //2.�����Լ����б��У��ٴη���private����
+    
+    
+    
     NF_SHARE_PTR<NFIObject> pObject = m_pKernelModule->GetObject(self);
     if (pObject)
     {
@@ -820,7 +821,7 @@ int NFCWorldNet_ServerModule::OnPropertyEnter(const NFIDataList& argVar, const N
             const NFINT64 nGameID = argGameID.Int(i);
             if (self == identOther)
             {
-                //�ҵ����������ص�FD
+                
                 SendMsgToGame(nGameID, NFMsg::EGMI_ACK_OBJECT_PROPERTY_ENTRY, xPrivateMsg, identOther);
             }
             else
@@ -878,6 +879,9 @@ void NFCWorldNet_ServerModule::ServerReport(int reportServerId, NFMsg::EServerSt
 				reqMsg.set_server_max_online(nMaxConnect);
 				reqMsg.set_server_state(serverStatus);
 				reqMsg.set_server_type(nServerType);
+
+				NFMsg::ServerInfoExt pb_ServerInfoExt;
+				reqMsg.mutable_server_info_list_ext()->CopyFrom(pb_ServerInfoExt);
 
 				std::shared_ptr<ConnectData> pServerData = m_pWorldToMasterModule->GetNetClientModule()->GetServerList().First();
 				if (pServerData)

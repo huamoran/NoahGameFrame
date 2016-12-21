@@ -1,8 +1,8 @@
 // -------------------------------------------------------------------------
-//    @FileName         ��    NFINetClientModule.hpp
-//    @Author           ��    LvSheng.Huang
-//    @Date             ��    2015-01-4
-//    @Module           ��    NFINetClientModule
+//    @FileName         :    NFINetClientModule.hpp
+//    @Author           :    LvSheng.Huang
+//    @Date             :    2015-01-4
+//    @Module           :    NFINetClientModule
 //
 // -------------------------------------------------------------------------
 
@@ -148,13 +148,11 @@ public:
     }
 
     ////////////////////////////////////////////////////////////////////////////////
-	//������,��ʱ����
     void SendByServerID(const int nServerID, const int nMsgID, const std::string& strData)
     {
         SendByServerID(nServerID, nMsgID, strData.c_str(), strData.length());
     }
 
-    //������,��ʱ����
     void SendByServerID(const int nServerID, const int nMsgID, const char* msg, const uint32_t nLen)
     {
         NF_SHARE_PTR<ConnectData> pServer = mxServerMap.GetElement(nServerID);
@@ -168,7 +166,6 @@ public:
         }
     }
 
-	//������,��ʱ����
 	void SendToAllServer(const int nMsgID, const std::string& strData)
 	{
 		NF_SHARE_PTR<ConnectData> pServer = mxServerMap.First();
@@ -233,18 +230,13 @@ public:
 
     void SendBySuit(const int& nHashKey, const int nMsgID, const char* msg, const uint32_t nLen)
     {
-        if (mxConsistentHash.Size() <= 0)
-        {
-            return;
-        }
+		NF_SHARE_PTR<ConnectData> pConnectData = mxServerMap.GetElementBySuit(nHashKey);
+		if (pConnectData)
+		{
 
-        NFCMachineNode xNode;
-        if (!GetServerMachineData(lexical_cast<std::string>(nHashKey), xNode))
-        {
-            return ;
-        }
+		}
 
-        SendByServerID(xNode.nMachineID, nMsgID, msg, nLen);
+        SendByServerID(pConnectData->nGameID, nMsgID, msg, nLen);
     }
 
     void SendSuitByPB(const std::string& strHashKey, const uint16_t nMsgID, google::protobuf::Message& xData)
@@ -255,18 +247,12 @@ public:
 
 	void SendSuitByPB(const int& nHashKey, const uint16_t nMsgID, google::protobuf::Message& xData)
 	{
-		if (mxConsistentHash.Size() <= 0)
+		NF_SHARE_PTR<ConnectData> pConnectData = mxServerMap.GetElementBySuit(nHashKey);
+		if (pConnectData)
 		{
-			return;
-		}
 
-		NFCMachineNode xNode;
-		if (!GetServerMachineData(lexical_cast<std::string> (nHashKey), xNode))
-		{
-			return ;
 		}
-
-		SendToServerByPB(xNode.nMachineID, nMsgID, xData);
+		SendToServerByPB(pConnectData->nGameID, nMsgID, xData);
 	}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -359,7 +345,6 @@ protected:
 			break;
 			case ConnectDataState::RECONNECT:
 			{
-				//����ʱ��
 				if ((pServerData->mnLastActionTime + 10) >= GetPluginManager()->GetNowTime())
 				{
 					break;
@@ -437,7 +422,8 @@ private:
         NF_SHARE_PTR<ConnectData> pServerInfo = GetServerNetInfo(pNet);
         if (pServerInfo.get())
         {
-            AddServerWeightData(pServerInfo);
+			/////////////////////////////////////////////////////////////////////////////////////
+            //AddServerWeightData(pServerInfo);
             pServerInfo->eState = ConnectDataState::NORMAL;
         }
 
@@ -449,7 +435,8 @@ private:
         NF_SHARE_PTR<ConnectData> pServerInfo = GetServerNetInfo(pNet);
         if (nullptr != pServerInfo)
         {
-            RemoveServerWeightData(pServerInfo);
+			/////////////////////////////////////////////////////////////////////////////////////
+			//RemoveServerWeightData(pServerInfo);
             pServerInfo->eState = ConnectDataState::DISCONNECT;
             pServerInfo->mnLastActionTime = GetPluginManager()->GetNowTime();
         }
@@ -466,7 +453,6 @@ private:
             NF_SHARE_PTR<ConnectData> xServerData = mxServerMap.GetElement(xInfo.nGameID);
             if (nullptr == xServerData)
             {
-				//�����������·�����
 				xServerData = NF_SHARE_PTR<ConnectData>(NF_NEW ConnectData());
 
 				xServerData->nGameID = xInfo.nGameID;
@@ -489,44 +475,10 @@ private:
         mxTempNetList.clear();
     }
 
-    bool GetServerMachineData(const std::string& strServerID, NFCMachineNode& xMachineData)
-    {
-        uint32_t nCRC32 = NFrame::CRC32(strServerID);
-        return mxConsistentHash.GetSuitNode(nCRC32, xMachineData);
-    }
-
-    void AddServerWeightData(NF_SHARE_PTR<ConnectData> xInfo)
-    {
-        //����Ȩ�ش����ڵ�
-        for (int j = 0; j < EConstDefine_DefaultWeith; ++j)
-        {
-            NFCMachineNode vNode(j);
-
-            vNode.nMachineID = xInfo->nGameID;
-            vNode.strIP = xInfo->strIP;
-            vNode.nPort = xInfo->nPort;
-            vNode.nWeight = EConstDefine_DefaultWeith;
-            mxConsistentHash.Insert(vNode);
-        }
-    }
-
-    void RemoveServerWeightData(NF_SHARE_PTR<ConnectData> xInfo)
-    {
-        for (int j = 0; j < EConstDefine_DefaultWeith; ++j)
-        {
-            NFCMachineNode vNode(j);
-
-            vNode.nMachineID = xInfo->nGameID;
-            vNode.strIP = xInfo->strIP;
-            vNode.nPort = xInfo->nPort;
-            vNode.nWeight = EConstDefine_DefaultWeith;
-            mxConsistentHash.Erase(vNode);
-        }
-    }
-
 private:
-	NFMapEx<int, ConnectData> mxServerMap;
-	NFCConsistentHash mxConsistentHash;
+	NFCConsistentHashMapEx<int, ConnectData> mxServerMap;
+	//NFMapEx<int, ConnectData> mxServerMap;
+	//NFCConsistentHash mxConsistentHash;
 
     std::list<ConnectData> mxTempNetList;
 

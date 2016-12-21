@@ -60,7 +60,6 @@ public:
     virtual bool DoEvent(const NFGUID& self, const std::string& strClassName, CLASS_OBJECT_EVENT eEvent, const NFIDataList& valueList) = 0;
 
     //////////////////////////////////////////////////////////////////////////
-    //ֻ������ģ��ע�ᣬ�ص�����ͬ���������¼�,���е������󶼻��ص�
     template<typename BaseType>
     bool RegisterCommonClassEvent(BaseType* pBase, int (BaseType::*handler)(const NFGUID&, const std::string&, const CLASS_OBJECT_EVENT, const NFIDataList&))
     {
@@ -69,7 +68,6 @@ public:
         return RegisterCommonClassEvent(functorPtr);
     }
 
-    //ֻ������ģ��ע�ᣬ�ص�����ͬ�����������¼�,���е������Զ����ص�
     template<typename BaseType>
     bool RegisterCommonPropertyEvent(BaseType* pBase, int (BaseType::*handler)(const NFGUID&, const std::string&, const NFIDataList::TData&, const NFIDataList::TData&))
     {
@@ -78,7 +76,6 @@ public:
         return RegisterCommonPropertyEvent(functorPtr);
     }
 
-    //ֻ������ģ��ע�ᣬ�ص�����ͬ�����������¼�,���е����������ص�
     template<typename BaseType>
     bool RegisterCommonRecordEvent(BaseType* pBase, int (BaseType::*handler)(const NFGUID&, const RECORD_EVENT_DATA&, const NFIDataList::TData&, const NFIDataList::TData&))
     {
@@ -169,26 +166,20 @@ public:
     virtual bool ExitGroupScene(const int nSceneID, const int nGroupID) = 0;
 
     virtual bool GetGroupObjectList(const int nSceneID, const int nGroupID, NFIDataList& list) = 0;
-    virtual int GetObjectByProperty(const int nSceneID, const std::string& strPropertyName, const NFIDataList& valueArg, NFIDataList& list) = 0;
+	virtual bool GetGroupObjectList(const int nSceneID, const int nGroupID, const std::string& strClassName, NFIDataList& list) = 0;
+	virtual bool GetGroupObjectList(const int nSceneID, const int nGroupID, const std::string& strClassName, const NFGUID& noSelf, NFIDataList& list) = 0;
+	virtual int GetObjectByProperty(const int nSceneID, const std::string& strPropertyName, const NFIDataList& valueArg, NFIDataList& list) = 0;
 
     virtual void Random(int nStart, int nEnd, int nCount, NFIDataList& valueList) = 0;
     virtual bool LogInfo(const NFGUID ident) = 0;
-
-	virtual NFINT64 GetTime() = 0;
 
 protected:
     virtual bool AddClassCallBack(const std::string& strClassName, const CLASS_EVENT_FUNCTOR_PTR& cb) = 0;
 
 
 protected:
-
-    //ֻ������ģ��ע�ᣬ�ص�����ͬ���������¼�,���е������󶼻��ص�
     virtual bool RegisterCommonClassEvent(const CLASS_EVENT_FUNCTOR_PTR& cb) = 0;
-
-    //ֻ������ģ��ע�ᣬ�ص�����ͬ�����������¼�,���е������Զ����ص�
     virtual bool RegisterCommonPropertyEvent(const PROPERTY_EVENT_FUNCTOR_PTR& cb) = 0;
-
-    //ֻ������ģ��ע�ᣬ�ص�����ͬ�����������¼�,���е����������ص�
     virtual bool RegisterCommonRecordEvent(const RECORD_EVENT_FUNCTOR_PTR& cb) = 0;
 };
 

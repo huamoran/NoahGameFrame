@@ -74,22 +74,10 @@
     <ClInclude Include="NFSphere.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="NFTime.h">
+    <ClInclude Include="NFMapEx.hpp">
       <Filter>Unit</Filter>
     </ClInclude>
-    <ClInclude Include="NFSingleton.h">
-      <Filter>Unit</Filter>
-    </ClInclude>
-    <ClInclude Include="NFQueue.h">
-      <Filter>Unit</Filter>
-    </ClInclude>
-    <ClInclude Include="NFMapEx.h">
-      <Filter>Unit</Filter>
-    </ClInclude>
-    <ClInclude Include="NFMap.h">
-      <Filter>Unit</Filter>
-    </ClInclude>
-    <ClInclude Include="NFList.h">
+    <ClInclude Include="NFList.hpp">
       <Filter>Unit</Filter>
     </ClInclude>
     <ClInclude Include="NFCComponentManager.h">
@@ -104,13 +92,16 @@
     <ClInclude Include="NFCConsistentHash.hpp">
       <Filter>Unit</Filter>
     </ClInclude>
-    <ClInclude Include="NFCAddConsistentHash.hpp">
-      <Filter>Unit</Filter>
-    </ClInclude>
-    <ClInclude Include="NFCMemManger.h">
-      <Filter>Unit</Filter>
-    </ClInclude>
     <ClInclude Include="NFCDataList.h">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="NFSpaceNode.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NFMemoryCounter.h">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="NFCMemManager.h">
       <Filter>Unit</Filter>
     </ClInclude>
   </ItemGroup>
@@ -139,10 +130,10 @@
     <ClCompile Include="NFCDataList.cpp">
       <Filter>Unit</Filter>
     </ClCompile>
-    <ClCompile Include="NFTime.cpp">
+    <ClCompile Include="NFMemoryCounter.cpp">
       <Filter>Unit</Filter>
     </ClCompile>
-    <ClCompile Include="NFCMemManger.cpp">
+    <ClCompile Include="NFCMemManager.cpp">
       <Filter>Unit</Filter>
     </ClCompile>
   </ItemGroup>

@@ -9,23 +9,42 @@
 #ifndef NFI_OBJECT_H
 #define NFI_OBJECT_H
 
-
-#include "NFComm/NFPluginModule/NFPlatform.h"
 #include "NFIDataList.h"
 #include "NFIRecord.h"
 #include "NFIRecordManager.h"
 #include "NFIPropertyManager.h"
 #include "NFIComponentManager.h"
+#include "NFComm/NFPluginModule/NFPlatform.h"
 #include "NFComm/NFPluginModule/NFIPluginManager.h"
 
-class NFIObject
+enum CLASS_OBJECT_EVENT
 {
-public:
-    NFIObject(NFGUID self)
-    {
+	COE_CREATE_NODATA,
+	COE_CREATE_LOADDATA,
+	COE_CREATE_BEFORE_EFFECT,
+	COE_CREATE_EFFECTDATA,
+	COE_CREATE_AFTER_EFFECT,
+	COE_CREATE_HASDATA,
+	COE_CREATE_FINISH,
+	COE_BEFOREDESTROY,
+	COE_DESTROY,
+};
 
+class _NFExport NFIObject :public NFMemoryCounter
+{
+private:
+	NFIObject() : NFMemoryCounter(GET_CLASS_NAME(NFIObject))
+	{
+	}
+
+public:
+    NFIObject(NFGUID self) : NFMemoryCounter(GET_CLASS_NAME(NFIObject))
+    {
     }
-    virtual ~NFIObject() {}
+
+    virtual ~NFIObject()
+	{
+	}
 
     virtual bool Execute() = 0;
 
@@ -76,6 +95,8 @@ public:
     }
 
     /////////////////////////////////////////////////////////////////
+	virtual CLASS_OBJECT_EVENT GetState() = 0;
+	virtual bool SetState(const CLASS_OBJECT_EVENT eState) = 0;
 
     virtual bool FindProperty(const std::string& strPropertyName) = 0;
 

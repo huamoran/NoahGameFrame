@@ -2,8 +2,7 @@
 //
 
 #include "NFMasterNet_HttpServerPlugin.h"
-#include "NFCMasterNet_HttpServerModule.h"
-
+#include "NFCMasterNet_HttpJsonModule.h"
 //
 //
 #ifdef NF_DYNAMIC_PLUGIN
@@ -31,15 +30,15 @@ const int NFMasterNet_HttpServerPlugin::GetPluginVersion()
 
 const std::string NFMasterNet_HttpServerPlugin::GetPluginName()
 {
-	return GET_CLASS_NAME(NFMasterNet_HttpServerPlugin)
+	return GET_CLASS_NAME(NFMasterNet_HttpServerPlugin);
 }
 
 void NFMasterNet_HttpServerPlugin::Install()
 {
-	REGISTER_MODULE(pPluginManager, NFIMasterNet_HttpServerModule, NFCMasterNet_HttpServerModule)
+	REGISTER_MODULE(pPluginManager, NFIMasterNet_JsonServerModule, NFCMasterNet_HttpJsonModule)
 }
 
 void NFMasterNet_HttpServerPlugin::Uninstall()
 {
-	UNREGISTER_MODULE(pPluginManager, NFIMasterNet_HttpServerModule, NFCMasterNet_HttpServerModule)
+	UNREGISTER_MODULE(pPluginManager, NFIMasterNet_JsonServerModule, NFCMasterNet_HttpJsonModule)
 }

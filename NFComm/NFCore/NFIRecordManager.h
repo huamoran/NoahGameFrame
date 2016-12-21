@@ -10,9 +10,10 @@
 #define NFI_RECORDMANAGER_H
 
 #include "NFIRecord.h"
-#include "NFMap.h"
+#include "NFMap.hpp"
+#include "NFComm/NFPluginModule/NFPlatform.h"
 
-class NFIRecordManager
+class _NFExport NFIRecordManager
     : public NFMapEx<std::string, NFIRecord>
 {
 public:

@@ -10,7 +10,7 @@
 #define NFI_RECORD_H
 
 #include "NFIDataList.h"
-
+#include "NFComm/NFPluginModule/NFPlatform.h"
 struct RECORD_EVENT_DATA
 {
 	enum RecordOptype
@@ -42,10 +42,12 @@ struct RECORD_EVENT_DATA
 typedef std::function<int(const NFGUID&, const RECORD_EVENT_DATA&, const NFIDataList::TData&, const NFIDataList::TData&)> RECORD_EVENT_FUNCTOR;
 typedef NF_SHARE_PTR<RECORD_EVENT_FUNCTOR> RECORD_EVENT_FUNCTOR_PTR;
 
-class NFIRecord
+class _NFExport NFIRecord :public NFMemoryCounter
 {
 public:
-    
+    NFIRecord() : NFMemoryCounter(GET_CLASS_NAME(NFIRecord))
+	{
+	}
 
     typedef std::vector< NF_SHARE_PTR<NFIDataList::TData> > TRECORDVEC;
     typedef TRECORDVEC::const_iterator TRECORDVECCONSTITER;
@@ -61,7 +63,7 @@ public:
     virtual TDATA_TYPE GetColType(const int nCol) const = 0;
     virtual const std::string& GetColTag(const int nCol) const = 0;
 
-    // 添加数据
+    
     virtual int AddRow(const int nRow) = 0;
     virtual int AddRow(const int nRow, const NFIDataList& var) = 0;
 
@@ -79,7 +81,7 @@ public:
 	virtual bool SetVector2(const int nRow, const std::string& strColTag, const NFVector2& value) = 0;
 	virtual bool SetVector3(const int nRow, const std::string& strColTag, const NFVector3& value) = 0;
 
-    // 获得数据
+    
     virtual bool QueryRow(const int nRow, NFIDataList& varList) = 0;
     virtual bool SwapRowInfo(const int nOriginRow, const int nTargetRow) = 0;
 

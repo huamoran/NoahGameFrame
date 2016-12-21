@@ -7,7 +7,6 @@
 // -------------------------------------------------------------------------
 
 #include "NFCPackModule.h"
-#include "NFComm/NFCore/NFTime.h"
 
 bool NFCPackModule::Init()
 {
@@ -21,7 +20,7 @@ bool NFCPackModule::Shut()
 
 bool NFCPackModule::Execute()
 {
-    //位置呢
+    
     return true;
 }
 
@@ -45,7 +44,7 @@ const NFGUID& NFCPackModule::CreateEquip( const NFGUID& self, const std::string&
 		return NULL_OBJECT;
 	}
 
-	//还得确定有这个装备
+	
 	bool bExist = m_pElementModule->ExistElement( strConfigName );
 	if ( !bExist )
 	{
@@ -70,7 +69,7 @@ const NFGUID& NFCPackModule::CreateEquip( const NFGUID& self, const std::string&
 
 	var->SetObject(NFrame::Player::BagEquipList_GUID, ident);
 	var->SetString(NFrame::Player::BagEquipList_ConfigID, strConfigName.c_str());
-	var->SetInt(NFrame::Player::BagEquipList_Date, NFTime::GetTime());
+	var->SetInt(NFrame::Player::BagEquipList_Date, pPluginManager->GetNowTime());
 
 
 	int nAddRow = pRecord->AddRow(-1, *var);
@@ -95,7 +94,7 @@ bool NFCPackModule::CreateItem( const NFGUID& self, const std::string& strConfig
 		return 0;
 	}
 
-	//还得确定有这个装备
+	
 	bool bExist = m_pElementModule->ExistElement(NFrame::Item::ThisName(), strConfigName );
 	if ( !bExist )
 	{
@@ -116,7 +115,7 @@ bool NFCPackModule::CreateItem( const NFGUID& self, const std::string& strConfig
 
 		xRowData->SetString(NFrame::Player::BagItemList_ConfigID, strConfigName);
 		xRowData->SetInt(NFrame::Player::BagItemList_ItemCount, nCount);
-		xRowData->SetInt(NFrame::Player::BagItemList_Date, NFTime::GetTime());
+		xRowData->SetInt(NFrame::Player::BagItemList_Date, pPluginManager->GetNowTime());
 	}
 	else
 	{
@@ -136,7 +135,7 @@ bool NFCPackModule::DeleteEquip( const NFGUID& self, const NFGUID& id )
 		return false;
 	}
 
-	//删除3个地方，背包，英雄穿戴，玩家穿戴
+	
 	NF_SHARE_PTR<NFIObject> pObject = m_pKernelModule->GetObject( self );
 	if (nullptr == pObject)
 	{
@@ -178,7 +177,7 @@ bool NFCPackModule::DeleteItem( const NFGUID& self, const std::string& strItemCo
 		return false;
 	}
 
-	//还得确定有这个装备
+	
 	if (!m_pElementModule->ExistElement(NFrame::Item::ThisName(), strItemConfigID))
 	{
 		return false;
@@ -241,7 +240,7 @@ bool NFCPackModule::EnoughItem( const NFGUID& self, const std::string& strItemCo
         return false;
     }
 
-    //还得确定有这个装备
+    
     bool bExist = m_pElementModule->ExistElement(NFrame::Item::ThisName(), strItemConfigID );
     if ( !bExist )
     {

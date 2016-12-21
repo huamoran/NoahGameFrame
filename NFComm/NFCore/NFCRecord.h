@@ -12,9 +12,9 @@
 #include <vector>
 #include "NFIRecord.h"
 #include "NFCDataList.h"
-#include "NFMapEx.h"
-
-class NFCRecord : public NFIRecord
+#include "NFMapEx.hpp"
+#include "NFComm/NFPluginModule/NFPlatform.h"
+class _NFExport NFCRecord : public NFIRecord
 {
 public:
     NFCRecord();
@@ -33,7 +33,7 @@ public:
     virtual TDATA_TYPE GetColType(const int nCol) const;
     virtual const std::string& GetColTag(const int nCol) const;
 
-    // 添加数据
+    
     virtual int AddRow(const int nRow);
 
     virtual int AddRow(const int nRow, const NFIDataList& var);
@@ -133,15 +133,15 @@ protected:
     void OnEventHandler(const NFGUID& self, const RECORD_EVENT_DATA& xEventData, const NFIDataList::TData& oldVar, const NFIDataList::TData& newVar);
 
 protected:
-    //记录这个表的Key类型，那样在读取和设置的时候才能保持正确
-	NF_SHARE_PTR<NFIDataList> mVarRecordType;//初始值类型--应该引用静态的(或者智能指针)，节约大量内存
-	NF_SHARE_PTR<NFIDataList> mVarRecordTag;//col的tag值--应该引用静态的(或者智能指针)，节约大量内存
+    
+	NF_SHARE_PTR<NFIDataList> mVarRecordType;
+	NF_SHARE_PTR<NFIDataList> mVarRecordTag;
 
-    std::map<std::string, int> mmTag;//tag->col转换
+    std::map<std::string, int> mmTag;
 
 	////////////////////////////
 	
-	TRECORDVEC mtRecordVec;//真的数据
+	TRECORDVEC mtRecordVec;
 	std::vector<int> mVecUsedState;
     int mnMaxRow;
 

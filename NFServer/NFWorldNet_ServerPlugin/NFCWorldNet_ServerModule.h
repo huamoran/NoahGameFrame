@@ -10,7 +10,7 @@
 #define NFC_WORLDNET_SERVER_MODULE_H
 
 //  the cause of sock'libariy, thenfore "NFCNet.h" much be included first.
-#include "NFComm/NFCore/NFMap.h"
+#include "NFComm/NFCore/NFMap.hpp"
 #include "NFComm/NFMessageDefine/NFMsgDefine.h"
 #include "NFComm/NFPluginModule/NFIWorldToMasterModule.h"
 #include "NFComm/NFPluginModule/NFIWorldLogicModule.h"
@@ -61,9 +61,9 @@ protected:
 
     void OnSocketEvent(const int nSockIndex, const NF_NET_EVENT eEvent, NFINet* pNet);
 
-    //连接丢失,删2层(连接对象，帐号对象)
+    
     void OnClientDisconnect(const int nAddress);
-    //有连接
+    
     void OnClientConnected(const int nAddress);
 
 

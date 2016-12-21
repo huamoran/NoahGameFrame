@@ -2,7 +2,6 @@
 #include "NFComm/NFCore/NFIObject.h"
 #include "NFComm/NFMessageDefine/NFSLGDefine.pb.h"
 #include "NFComm/NFMessageDefine/NFProtocolDefine.hpp"
-#include "NFComm/NFCore/NFTime.h"
 
 NFCSLGBuildingModule::NFCSLGBuildingModule(NFIPluginManager* p)
 {
@@ -83,7 +82,7 @@ int NFCSLGBuildingModule::AddBuilding(const NFGUID& self, const std::string& str
     xDataList << int(fY); // y
     xDataList << int(fZ); // z
 
-    xDataList << NFTime::GetTime();
+	xDataList << pPluginManager->GetNowTime();
     xDataList << int(0);
 
     if (0 > pRecord->AddRow(-1, xDataList))
@@ -113,17 +112,17 @@ int NFCSLGBuildingModule::Upgrade(const NFGUID& self, const NFGUID& xBuilID)
     }
 
     const int nRow = var.Int(0);
-    const int nNeedTime = 20;//升级所需要的时间 //TO ADD
+    const int nNeedTime = 20;
     const std::string strBuildID = pRecord->GetString(nRow, "BuildingID");
 
     //NFCDataList varHeart;
     //varHeart << xBuilID;
     m_pScheduleModule->AddSchedule(self, "OnUpgradeHeartBeat", this, &NFCSLGBuildingModule::OnUpgradeHeartBeat, /*varHeart,*/ nNeedTime, 1);
 
-    //修改建筑的状态
+    
     pRecord->SetInt(nRow, "State", NFMsg::EBS_UPGRADE);
-    pRecord->SetInt(nRow, "StateStartTime", NFTime::GetTime());
-    pRecord->SetInt(nRow, "StateEndTime", NFTime::GetTime() + nNeedTime);
+    pRecord->SetInt(nRow, "StateStartTime", pPluginManager->GetNowTime());
+    pRecord->SetInt(nRow, "StateEndTime", pPluginManager->GetNowTime() + nNeedTime);
 
     return 0;
 }
@@ -157,12 +156,12 @@ int NFCSLGBuildingModule::OnUpgradeHeartBeat(const NFGUID& self, const std::stri
 //     const int nRow = var.Int(0);
 //     const std::string strBuildID = pRecord->GetString(nRow, "BuildingID");
 // 
-//     //升级
+//     
 //     //TO ADD
 // 
-//     //修改建筑的状态
+//     
 //     pRecord->SetInt(nRow, "State", NFMsg::EBS_IDLE);
-//     pRecord->SetInt(nRow, "StateStartTime", NFTime::GetTime());
+//     pRecord->SetInt(nRow, "StateStartTime", pPluginManager->GetNowTime());
 //     pRecord->SetInt(nRow, "StateEndTime", 0);
 
     return 0;
@@ -195,9 +194,9 @@ int NFCSLGBuildingModule::OnBoostHeartBeat( const NFGUID& self, const std::strin
 // 
 //     const int nRow = var.Int(0);
 // 
-//     //修改建筑的状态
+//     
 //     pRecord->SetInt(nRow, "State", NFMsg::EBS_IDLE);
-//     pRecord->SetInt(nRow, "StateStartTime", NFTime::GetTime());
+//     pRecord->SetInt(nRow, "StateStartTime", pPluginManager->GetNowTime());
 //     pRecord->SetInt(nRow, "StateEndTime", 0);
 
     return 0;
@@ -256,17 +255,17 @@ int NFCSLGBuildingModule::Boost(const NFGUID& self, const NFGUID& xBuilID)
     }
 
     const int nRow = var.Int(0);
-    const int nBoostTime = 20;//加速时间 // TO ADD
+    const int nBoostTime = 20;
     const std::string strBuildID = pRecord->GetString(nRow, "BuildingID");
 
     //NFCDataList varHeart;
     //varHeart << xBuilID;
     m_pScheduleModule->AddSchedule(self, "OnBoostHeartBeat", this, &NFCSLGBuildingModule::OnBoostHeartBeat, /*varHeart,*/ nBoostTime, 1);
 
-    //修改建筑的状态
+    
     pRecord->SetInt(nRow, "State", NFMsg::EBS_BOOST);
-    pRecord->SetInt(nRow, "StateStartTime", NFTime::GetTime());
-    pRecord->SetInt(nRow, "StateEndTime", NFTime::GetTime() + nBoostTime);
+    pRecord->SetInt(nRow, "StateStartTime", pPluginManager->GetNowTime());
+    pRecord->SetInt(nRow, "StateEndTime", pPluginManager->GetNowTime() + nBoostTime);
 
     return 0;
 }
@@ -288,7 +287,7 @@ int NFCSLGBuildingModule::Produce(const NFGUID& self, const NFGUID& xBuilID, con
         return 1;
     }
 
-    //增加
+    
     AddProduceData(self, xBuilID, strItemID, nCount);
 
     const std::string strHeartname = GetProduceHeartName(self, xBuilID, strItemID);
@@ -339,7 +338,7 @@ int NFCSLGBuildingModule::CheckBuildingStatusEnd( const NFGUID& self )
         return 1;
     }
 
-    const NFINT64 nNowTime = NFTime::GetTime();
+    const NFINT64 nNowTime = pPluginManager->GetNowTime();
     for (int i= 0; i < pRecord->GetRows(); i++)
     {
         if (!pRecord->IsUsed(i))
@@ -423,14 +422,14 @@ int NFCSLGBuildingModule::AddProduceData(const NFGUID& self, const NFGUID& xBuil
     }
     else
     {
-        const int nTime = 20;//生产时间 //TO ADD
+        const int nTime = 20;
         NFCDataList varItem;
 
         varItem << xBuilID;
         varItem << strItemID;
         varItem << nCount;
         varItem << nTime;
-        varItem << NFTime::GetTime();
+        varItem << pPluginManager->GetNowTime();
 
         pProduce->AddRow(-1, varItem);
     }
@@ -512,7 +511,7 @@ int NFCSLGBuildingModule::CheckProduceData( const NFGUID& self )
             continue;
         }
 
-        const int nNowTime = NFTime::GetTime();
+        const int nNowTime = pPluginManager->GetNowTime();
         const NFGUID xBuildID = pProduce->GetObject(i, "BuildingGUID");
         const std::string strItemID = pProduce->GetString(i, "ItemID");
         const int nLeftCount = pProduce->GetInt(i, "LeftCount");
@@ -540,7 +539,7 @@ int NFCSLGBuildingModule::CheckProduceData( const NFGUID& self )
 
             pProduce->SetInt(i, "", nLeftCount - nCount);
 
-            //增加定时任务
+            
             //NFCDataList varHeart;
             //varHeart << xBuildID;
             //varHeart << strItemID;

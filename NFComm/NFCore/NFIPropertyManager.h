@@ -9,11 +9,11 @@
 #ifndef NFI_PROPERTYMANAGER_H
 #define NFI_PROPERTYMANAGER_H
 
-#include "NFMap.h"
+#include "NFMap.hpp"
 #include "NFIProperty.h"
 #include <map>
-
-class NFIPropertyManager
+#include "NFComm/NFPluginModule/NFPlatform.h"
+class _NFExport NFIPropertyManager
     : public NFMapEx<std::string, NFIProperty>
 {
 public:

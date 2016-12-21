@@ -22,7 +22,7 @@
 #include "NFComm/NFPluginModule/NFIKernelModule.h"
 #include "NFComm/NFPluginModule/NFIClassModule.h"
 #include "NFComm/NFPluginModule/NFIElementModule.h"
-#include "NFComm/NFPluginModule/NFISceneModule.h"
+#include "NFComm/NFPluginModule/NFISceneAOIModule.h"
 #include "NFComm/NFPluginModule/NFIScheduleModule.h"
 #include "NFComm/NFPluginModule/NFIEventModule.h"
 
@@ -127,8 +127,10 @@ public:
     virtual bool ReleaseGroupScene(const int nSceneID, const int nGroupID);
     virtual bool ExitGroupScene(const int nSceneID, const int nGroupID);
 
-    virtual bool GetGroupObjectList(const int nSceneID, const int nGroupID, NFIDataList& list);
-    virtual int GetObjectByProperty(const int nSceneID, const std::string& strPropertyName, const NFIDataList& valueArgArg, NFIDataList& list);
+	virtual bool GetGroupObjectList(const int nSceneID, const int nGroupID, NFIDataList& list);
+	virtual bool GetGroupObjectList(const int nSceneID, const int nGroupID, const std::string& strClassName, NFIDataList& list);
+	virtual bool GetGroupObjectList(const int nSceneID, const int nGroupID, const std::string& strClassName, const NFGUID& noSelf, NFIDataList& list);
+	virtual int GetObjectByProperty(const int nSceneID, const std::string& strPropertyName, const NFIDataList& valueArgArg, NFIDataList& list);
 
     virtual void Random(int nStart, int nEnd, int nCount, NFIDataList& valueList);
 
@@ -139,19 +141,17 @@ public:
 
     //////////////////////////////////////////////////////////////////////////
 
-	virtual NFINT64 GetTime();
-
     virtual bool DoEvent(const NFGUID& self, const std::string& strClassName, CLASS_OBJECT_EVENT eEvent, const NFIDataList& valueList);
 
 protected:
 
-    //只能网络[脚本]模块注册，回调用来同步对象类事件,所有的类对象都会回调
+    
     virtual bool RegisterCommonClassEvent(const CLASS_EVENT_FUNCTOR_PTR& cb);
 
-    //只能网络[脚本]模块注册，回调用来同步对象属性事件,所有的类属性都会回调
+    
     virtual bool RegisterCommonPropertyEvent(const PROPERTY_EVENT_FUNCTOR_PTR& cb);
 
-    //只能网络[脚本]模块注册，回调用来同步对象类表事件,所有的类表都会回调
+    
     virtual bool RegisterCommonRecordEvent(const RECORD_EVENT_FUNCTOR_PTR& cb);
 
 protected:
@@ -171,15 +171,15 @@ protected:
     std::list<NFGUID> mtDeleteSelfList;
 
     //////////////////////////////////////////////////////////////////////////
-    //通用对象类事件回调,以便同步
+    
     std::list<CLASS_EVENT_FUNCTOR_PTR> mtCommonClassCallBackList;
-    //通用属性变动回调,以便同步
+    
     std::list<PROPERTY_EVENT_FUNCTOR_PTR> mtCommonPropertyCallBackList;
-    //通用表变动回调,以便同步
+    
     std::list<RECORD_EVENT_FUNCTOR_PTR> mtCommonRecordCallBackList;
 
 private:
-    //属性的KEY，比如HP=1，会以这个建立KEY，那么可以快速查询所有HP=1的对象而不用遍历
+    
     //     std::map<std::string,std::map<TData, NFList<NFGUID>>>
     //     std::map<"Scene", std::map<10, NFList<NFGUID>>>
 
@@ -191,7 +191,7 @@ private:
     NFGUID mnCurExeObject;
     NFINT64 nLastTime;
 
-    NFISceneModule* m_pSceneModule;
+	NFISceneAOIModule* m_pSceneModule;
     NFILogModule* m_pLogModule;
     NFIClassModule* m_pClassModule;
     NFIElementModule* m_pElementModule;

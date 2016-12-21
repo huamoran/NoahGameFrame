@@ -10,10 +10,9 @@
 #include "NFComm/NFCore/NFCObject.h"
 #include "NFComm/NFCore/NFCDataList.h"
 #include "NFComm/NFCore/NFCRecord.h"
+#include "NFComm/NFCore/NFCMemManager.h"
 #include "NFComm/NFPluginModule/NFGUID.h"
-#include "NFComm/NFCore/NFCMemManger.h"
 #include "NFComm/NFMessageDefine/NFProtocolDefine.hpp"
-#include "NFComm/NFCore/NFTime.h"
 
 NFCKernelModule::NFCKernelModule(NFIPluginManager* p)
 {
@@ -53,7 +52,7 @@ bool NFCKernelModule::Init()
 {
     mtDeleteSelfList.clear();
 
-    m_pSceneModule = pPluginManager->FindModule<NFISceneModule>();
+    m_pSceneModule = pPluginManager->FindModule<NFISceneAOIModule>();
     m_pClassModule = pPluginManager->FindModule<NFIClassModule>();
     m_pElementModule = pPluginManager->FindModule<NFIElementModule>();
     m_pLogModule = pPluginManager->FindModule<NFILogModule>();
@@ -123,7 +122,7 @@ NF_SHARE_PTR<NFIObject> NFCKernelModule::CreateObject(const NFGUID& self, const 
     //      return pObject;
     //  }
 
-    //默认为1分组，0则是所有分组都看得见,-1则是容器
+    
     if (ident.IsNull())
     {
         ident = CreateGUID();
@@ -142,7 +141,7 @@ NF_SHARE_PTR<NFIObject> NFCKernelModule::CreateObject(const NFGUID& self, const 
     {
 
         pObject = NF_SHARE_PTR<NFIObject>(NF_NEW NFCObject(ident, pPluginManager));
-        //是否是应该晚点等到事件2时才加入容器，这样能保证进入容器的对象都是有完整数据的，否则因为协程的原因，其他对象找到他时他却没数据或者部分数据
+        
         AddElement(ident, pObject);
         pContainerInfo->AddObjectToGroup(nGroupID, ident, strClassName == NFrame::Player::ThisName() ? true : false);
 
@@ -150,7 +149,7 @@ NF_SHARE_PTR<NFIObject> NFCKernelModule::CreateObject(const NFGUID& self, const 
         NF_SHARE_PTR<NFIRecordManager> pRecordManager = pObject->GetRecordManager();
         NF_SHARE_PTR<NFIComponentManager> pComponentManager = pObject->GetComponentManager();
 
-        //默认属性
+        
         NF_SHARE_PTR<NFIProperty> pStaticConfigPropertyInfo = pStaticClassPropertyManager->First();
         while (pStaticConfigPropertyInfo)
         {
@@ -163,7 +162,7 @@ NF_SHARE_PTR<NFIObject> NFCKernelModule::CreateObject(const NFGUID& self, const 
             xProperty->SetRef(pStaticConfigPropertyInfo->GetRef());
 			xProperty->SetUpload(pStaticConfigPropertyInfo->GetUpload());
 
-            //通用回调，方便NET同步
+            
             pObject->AddPropertyCallBack(pStaticConfigPropertyInfo->GetKey(), this, &NFCKernelModule::OnPropertyCommonEvent);
 
             pStaticConfigPropertyInfo = pStaticClassPropertyManager->Next();
@@ -183,17 +182,14 @@ NF_SHARE_PTR<NFIObject> NFCKernelModule::CreateObject(const NFGUID& self, const 
              xRecord->SetSave(pConfigRecordInfo->GetSave());
              xRecord->SetCache(pConfigRecordInfo->GetCache());
 			 xRecord->SetUpload(pConfigRecordInfo->GetUpload());
-
-
-
-            //通用回调，方便NET同步
+            
             pObject->AddRecordCallBack(pConfigRecordInfo->GetName(), this, &NFCKernelModule::OnRecordCommonEvent);
 
             pConfigRecordInfo = pStaticClassRecordManager->Next();
         }
 
         //////////////////////////////////////////////////////////////////////////
-        //配置属性
+        
         NF_SHARE_PTR<NFIPropertyManager> pConfigPropertyManager = m_pElementModule->GetPropertyManager(strConfigIndex);
         NF_SHARE_PTR<NFIRecordManager> pConfigRecordManager = m_pElementModule->GetRecordManager(strConfigIndex);
 
@@ -211,9 +207,9 @@ NF_SHARE_PTR<NFIObject> NFCKernelModule::CreateObject(const NFGUID& self, const 
             }
         }
 
-        DoEvent(ident, strClassName, CLASS_OBJECT_EVENT::COE_CREATE_NODATA, arg);
+        DoEvent(ident, strClassName, pObject->GetState(), arg);
 
-        //传入的属性赋值
+        
         for (int i = 0; i < arg.GetCount() - 1; i += 2)
         {
             const std::string& strPropertyName = arg.String(i);
@@ -246,17 +242,29 @@ NF_SHARE_PTR<NFIObject> NFCKernelModule::CreateObject(const NFGUID& self, const 
             }
         }
 
-        //放进容器//先进入场景，再进入层
+        
         pObject->SetPropertyString(NFrame::IObject::ConfigID(), strConfigIndex);
         pObject->SetPropertyString(NFrame::IObject::ClassName(), strClassName);
         pObject->SetPropertyInt(NFrame::IObject::SceneID(), nSceneID);
         pObject->SetPropertyInt(NFrame::IObject::GroupID(), nGroupID);
 
-        DoEvent(ident, strClassName, COE_CREATE_LOADDATA, arg);
-        DoEvent(ident, strClassName, COE_CREATE_BEFORE_EFFECT, arg);
-        DoEvent(ident, strClassName, COE_CREATE_EFFECTDATA, arg);
-        DoEvent(ident, strClassName, COE_CREATE_AFTER_EFFECT, arg);
-        DoEvent(ident, strClassName, COE_CREATE_HASDATA, arg);
+		pObject->SetState(COE_CREATE_LOADDATA);
+		DoEvent(ident, strClassName, pObject->GetState(), arg);
+
+		pObject->SetState(COE_CREATE_BEFORE_EFFECT);
+		DoEvent(ident, strClassName, pObject->GetState(), arg);
+
+		pObject->SetState(COE_CREATE_EFFECTDATA);
+		DoEvent(ident, strClassName, pObject->GetState(), arg);
+
+		pObject->SetState(COE_CREATE_AFTER_EFFECT);
+		DoEvent(ident, strClassName, pObject->GetState(), arg);
+
+		pObject->SetState(COE_CREATE_HASDATA);
+		DoEvent(ident, strClassName, pObject->GetState(), arg);
+
+		pObject->SetState(COE_CREATE_FINISH);
+		DoEvent(ident, strClassName, pObject->GetState(), arg);
     }
 
     return pObject;
@@ -267,11 +275,11 @@ bool NFCKernelModule::DestroyObject(const NFGUID& self)
     if (self == mnCurExeObject
         && !self.IsNull())
     {
-        //自己的循环过程中，不能删除自己，得等下一帧才行
+        
         return DestroySelf(self);
     }
 
-    //需要同时从容器中删掉
+    
     NFINT64 nGroupID = GetPropertyInt(self, NFrame::IObject::GroupID());
     NFINT64 nSceneID = GetPropertyInt(self, NFrame::IObject::SceneID());
 
@@ -895,8 +903,8 @@ bool NFCKernelModule::SwitchScene(const NFGUID& self, const int nTargetSceneID, 
     NF_SHARE_PTR<NFIObject> pObject = GetElement(self);
     if (pObject)
     {
-        NFINT64 nOldSceneID = pObject->GetPropertyInt("SceneID");
-        NFINT64 nOldGroupID = pObject->GetPropertyInt("GroupID");
+        NFINT64 nOldSceneID = pObject->GetPropertyInt(NFrame::Scene::SceneID());
+        NFINT64 nOldGroupID = pObject->GetPropertyInt(NFrame::Scene::GroupID());
 
         NF_SHARE_PTR<NFCSceneInfo> pOldSceneInfo = m_pSceneModule->GetElement(nOldSceneID);
         NF_SHARE_PTR<NFCSceneInfo> pNewSceneInfo = m_pSceneModule->GetElement(nTargetSceneID);
@@ -920,22 +928,19 @@ bool NFCKernelModule::SwitchScene(const NFGUID& self, const int nTargetSceneID, 
 
         pOldSceneInfo->RemoveObjectFromGroup(nOldGroupID, self, true);
 
-        //可以在同一场景切换到不同的层
+        
         if (nTargetSceneID != nOldSceneID)
         {
-            //真的切场景
-            //先退回到0层，才能修改场景ID
-            pObject->SetPropertyInt("GroupID", 0);
+            pObject->SetPropertyInt(NFrame::Scene::GroupID(), 0);
 
-            pObject->SetPropertyInt("SceneID", nTargetSceneID);
-            //进新的场景0层
+            pObject->SetPropertyInt(NFrame::Scene::SceneID(), nTargetSceneID);
         }
 
         pObject->SetPropertyFloat("X", fX);
         pObject->SetPropertyFloat("Y", fY);
         pObject->SetPropertyFloat("Z", fZ);
 
-        pObject->SetPropertyInt("GroupID", nTargetGroupID);
+        pObject->SetPropertyInt(NFrame::Scene::GroupID(), nTargetGroupID);
 
         pNewSceneInfo->AddObjectToGroup(nTargetGroupID, self, true);
 
@@ -950,13 +955,13 @@ bool NFCKernelModule::SwitchScene(const NFGUID& self, const int nTargetSceneID, 
 NFGUID NFCKernelModule::CreateGUID()
 {
     int64_t value = 0;   
-    uint64_t time = GetTime();
+    uint64_t time = NFGetTime();
 
-    // 保留后48位时间
+    
     //value = time << 16;
     value = time * 1000000;
 
-    // 最后16位是sequenceID
+    
     //value |= nGUIDIndex++;
     value += nGUIDIndex++;
 
@@ -981,13 +986,11 @@ bool NFCKernelModule::CreateScene(const int nSceneID)
         return false;
     }
 
-    //容器nSceneIndex
     pSceneInfo = NF_SHARE_PTR<NFCSceneInfo>(NF_NEW NFCSceneInfo(nSceneID));
     if (pSceneInfo)
     {
         m_pSceneModule->AddElement(nSceneID, pSceneInfo);
-
-        //默认分组0
+        
         NF_SHARE_PTR<NFCSceneGroupInfo> pGroupInfo = NF_SHARE_PTR<NFCSceneGroupInfo>(NF_NEW NFCSceneGroupInfo(nSceneID, 0));
         if (NULL != pGroupInfo)
         {
@@ -1198,6 +1201,57 @@ bool NFCKernelModule::GetGroupObjectList(const int nSceneID, const int nGroupID,
     return false;
 }
 
+bool NFCKernelModule::GetGroupObjectList(const int nSceneID, const int nGroupID, const std::string & strClassName, NFIDataList & list)
+{
+	NFCDataList xDataList;
+	if (GetGroupObjectList(nSceneID, nGroupID, xDataList))
+	{
+		for (int i = 0; i < xDataList.GetCount(); i++)
+		{
+			NFGUID xID = xDataList.Object(i);
+			if (xID.IsNull())
+			{
+				continue;
+			}
+
+			if (this->GetPropertyString(xID, NFrame::IObject::ClassName()) == strClassName)
+			{
+				list.AddObject(xID);
+			}
+		}
+		
+		return true;
+	}
+
+	return false;
+}
+
+bool NFCKernelModule::GetGroupObjectList(const int nSceneID, const int nGroupID, const std::string & strClassName, const NFGUID & noSelf, NFIDataList & list)
+{
+	NFCDataList xDataList;
+	if (GetGroupObjectList(nSceneID, nGroupID, xDataList))
+	{
+		for (int i = 0; i < xDataList.GetCount(); i++)
+		{
+			NFGUID xID = xDataList.Object(i);
+			if (xID.IsNull())
+			{
+				continue;
+			}
+
+			if (this->GetPropertyString(xID, NFrame::IObject::ClassName()) == strClassName
+				&& xID != noSelf)
+			{
+				list.AddObject(xID);
+			}
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 bool NFCKernelModule::LogStack()
 {
 #if NF_PLATFORM == NF_PLATFORM_WIN
@@ -1217,7 +1271,7 @@ bool NFCKernelModule::LogStack()
 
 bool NFCKernelModule::LogInfo(const NFGUID ident)
 {
-    //看是容器还是普通对象，容器则打印所有对象
+    
     NF_SHARE_PTR<NFIObject> pObject = GetObject(ident);
     if (pObject)
     {
@@ -1436,11 +1490,6 @@ bool NFCKernelModule::LogSelfInfo(const NFGUID ident)
     return false;
 }
 
-NFINT64 NFCKernelModule::GetTime()
-{
-	return NFTime::GetTime();
-}
-
 bool NFCKernelModule::AfterInit()
 {
     NF_SHARE_PTR<NFIClass> pClass = m_pClassModule->First();
@@ -1464,7 +1513,7 @@ bool NFCKernelModule::DestroyAll()
         pObject = Next();
     }
 
-    // 为了释放object
+    
     Execute();
 
     m_pSceneModule->ClearAll();
@@ -1514,7 +1563,7 @@ void NFCKernelModule::ProcessMemFree()
 
     nLastTime = pPluginManager->GetNowTime();
 
-    NFCMemManger::GetSingletonPtr()->FreeMem();
+    NFCMemManager::GetSingletonPtr()->FreeMem();
 }
 
 bool NFCKernelModule::DoEvent(const NFGUID& self, const std::string& strClassName, CLASS_OBJECT_EVENT eEvent, const NFIDataList& valueList)

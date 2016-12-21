@@ -20,6 +20,12 @@ enum NFEventDefine
 	//arg[0]:resultID[EGameErrorCode]
 	NFED_ON_GENERAL_MESSAGE,
 
+	////////////////core events for NF--start////////////////////////////////////////////////////////
+	//scene swap
+	//common property
+	//common record
+
+	////////////////core events for NF--end//////////////////////////////////////////////////////////
 	//arg[0]:x,y,z
 	NFED_ON_CLIENT_REQUIRE_MOVE,
 	NFED_ON_CLIENT_MOVE_RESULT,
@@ -38,18 +44,9 @@ enum NFEventDefine
 	//arg[0]:itemID, fx, fy, fz, TargetObjectList
 	NFED_ON_CLIENT_REQUIRE_USE_ITEM_POS,
 
-	//arg[0]:object,type,sceneID,line
-	NFED_ON_CLIENT_ENTER_SCENE,
-	//arg[0]:object
-	NFED_ON_CLIENT_LEAVE_SCENE,
-
-	//arg[0]:object,type,sceneID,line
-	NFED_ON_OBJECT_ENTER_SCENE_BEFORE,
-	NFED_ON_OBJECT_ENTER_SCENE_RESULT,
-
 	NFED_ON_OBJECT_BE_KILLED,
 
-	// 通知副本奖励
+
 	NFED_ON_NOTICE_ECTYPE_AWARD,
 
 };
